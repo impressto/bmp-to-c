@@ -1,5 +1,5 @@
-import { Box, Input, Text, Image } from '@chakra-ui/react';
-import { useState } from 'react';
+import { Box, Button, Text, Image } from '@chakra-ui/react';
+import { useState, useRef } from 'react';
 import type { ChangeEvent } from 'react';
 
 interface FileUploadProps {
@@ -34,22 +34,31 @@ export const FileUpload = ({ onFileSelect }: FileUploadProps) => {
     onFileSelect(file);
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   return (
     <Box>
-      <Input
+      <input
         type="file"
         accept=".bmp"
         onChange={handleFileChange}
-        p={2}
-        border="2px dashed"
-        borderColor="gray.300"
-        borderRadius="md"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
       />
+      <Button
+        colorScheme="blue"
+        size="lg"
+        onClick={() => fileInputRef.current?.click()}
+        leftIcon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 16h6M12 16V8M12 8l3 3M12 8l-3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>}
+      >
+        Choose BMP File
+      </Button>
 
       {fileInfo && (
         <Box mt={4}>
-          <Text><strong>Name:</strong> {fileInfo.name}</Text>
-          <Text><strong>Size:</strong> {fileInfo.size}</Text>
+          <Text><strong>Name:</strong> {fileInfo.name} - <strong>Size:</strong> {fileInfo.size}</Text>
         </Box>
       )}
 

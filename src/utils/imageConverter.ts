@@ -29,12 +29,26 @@ export const resizeImage = (
   tempCanvas.width = imageData.width;
   tempCanvas.height = imageData.height;
 
+  // Convert RGB565 back to RGBA
+  const rgba = new Uint8ClampedArray(imageData.width * imageData.height * 4);
+  for (let i = 0; i < imageData.data.length; i += 2) {
+    const high = imageData.data[i];
+    const low = imageData.data[i + 1];
+    const value = (high << 8) | low;
+    
+    const r = (value >> 11) & 0x1F;
+    const g = (value >> 5) & 0x3F;
+    const b = value & 0x1F;
+    
+    const j = (i / 2) * 4;
+    rgba[j] = (r << 3) | (r >> 2);     // 5 bits to 8 bits
+    rgba[j + 1] = (g << 2) | (g >> 4);  // 6 bits to 8 bits
+    rgba[j + 2] = (b << 3) | (b >> 2);  // 5 bits to 8 bits
+    rgba[j + 3] = 255;                  // Alpha channel
+  }
+
   // Create ImageData and put it on temp canvas
-  const originalImgData = new ImageData(
-    new Uint8ClampedArray(imageData.data),
-    imageData.width,
-    imageData.height
-  );
+  const originalImgData = new ImageData(rgba, imageData.width, imageData.height);
   tempCtx.putImageData(originalImgData, 0, 0);
 
   // Draw resized image
@@ -52,25 +66,11 @@ export const resizeImage = (
 
 export const convertToC = (
   imageData: ImageData,
-  options: {
-    variableName?: string;
-    useConst?: boolean;
-    usePROGMEM?: boolean;
-  } = {}
+  filename: string
 ): string => {
-  const {
-    variableName = 'image_data',
-    useConst = true,
-    usePROGMEM = true
-  } = options;
-
   const declarations: string[] = [];
-  const constKeyword = useConst ? 'const ' : '';
-  const progmemKeyword = usePROGMEM ? ' PROGMEM' : '';
-
-  // Add image dimensions
-  declarations.push(`${constKeyword}int ${variableName}_width = ${imageData.width};`);
-  declarations.push(`${constKeyword}int ${variableName}_height = ${imageData.height};`);
+  const variableName = filename.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9_]/g, "_");
+  const progmemKeyword = ' PROGMEM';
 
   // Convert RGB565 bytes to hex values
   const bytes = Array.from(imageData.data);
@@ -82,9 +82,12 @@ export const convertToC = (
   }
   const formattedHexData = hexData.join(', ');
 
-  // Add image data array as 16-bit values
+  // Calculate array size
+  const arraySize = hexData.length;
+  
+  // Add image data array as 16-bit values with size comment
   declarations.push(
-    `${constKeyword}int16_t ${variableName}[]${progmemKeyword} = {
+    `// array size is ${arraySize}\nint16_t ${variableName}[]${progmemKeyword} = {
   ${formattedHexData}
 };`
   );

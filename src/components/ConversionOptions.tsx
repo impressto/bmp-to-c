@@ -3,7 +3,6 @@ import {
   Box,
   Input,
   Text,
-  Checkbox,
   FormControl,
   FormLabel,
   VStack,
@@ -13,21 +12,16 @@ import {
 export interface ConversionOptions {
   resizeWidth?: number;
   resizeHeight?: number;
-  useConst: boolean;
-  usePROGMEM: boolean;
-  variableName: string;
 }
 
 interface ConversionOptionsFormProps {
   onChange: (options: ConversionOptions) => void;
+  originalWidth?: number;
+  originalHeight?: number;
 }
 
-export const ConversionOptionsForm = ({ onChange }: ConversionOptionsFormProps) => {
-  const [options, setOptions] = useState<ConversionOptions>({
-    useConst: true,
-    usePROGMEM: true,
-    variableName: 'image_data'
-  });
+export const ConversionOptionsForm = ({ onChange, originalWidth, originalHeight }: ConversionOptionsFormProps) => {
+  const [options, setOptions] = useState<ConversionOptions>({});
 
   const handleChange = (field: keyof ConversionOptions, value: any) => {
     const newOptions = { ...options, [field]: value };
@@ -43,7 +37,7 @@ export const ConversionOptionsForm = ({ onChange }: ConversionOptionsFormProps) 
           <FormControl>
             <Input
               type="number"
-              placeholder="Width"
+              placeholder={originalWidth ? `Width (${originalWidth})` : 'Width'}
               value={options.resizeWidth || ''}
               onChange={(e) => {
                 const value = e.target.value ? parseInt(e.target.value) : undefined;
@@ -55,7 +49,7 @@ export const ConversionOptionsForm = ({ onChange }: ConversionOptionsFormProps) 
           <FormControl>
             <Input
               type="number"
-              placeholder="Height"
+              placeholder={originalHeight ? `Height (${originalHeight})` : 'Height'}
               value={options.resizeHeight || ''}
               onChange={(e) => {
                 const value = e.target.value ? parseInt(e.target.value) : undefined;
@@ -66,30 +60,9 @@ export const ConversionOptionsForm = ({ onChange }: ConversionOptionsFormProps) 
         </HStack>
       </Box>
 
-      <FormControl>
-        <FormLabel>Variable Name</FormLabel>
-        <Input
-          value={options.variableName}
-          onChange={(e) => handleChange('variableName', e.target.value)}
-        />
-      </FormControl>
-
-      <FormControl display="flex" alignItems="center">
-        <FormLabel mb="0">Use const</FormLabel>
-        <Checkbox
-          isChecked={options.useConst}
-          onChange={(e) => handleChange('useConst', e.target.checked)}
-        />
-      </FormControl>
 
 
-      <FormControl display="flex" alignItems="center">
-        <FormLabel mb="0">Use PROGMEM</FormLabel>
-        <Checkbox
-          isChecked={options.usePROGMEM}
-          onChange={(e) => handleChange('usePROGMEM', e.target.checked)}
-        />
-      </FormControl>
+
     </VStack>
   );
 };
