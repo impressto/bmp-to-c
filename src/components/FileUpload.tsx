@@ -1,6 +1,6 @@
-import { Box, Button, Text, Image } from '@chakra-ui/react';
 import { useState, useRef } from 'react';
 import type { ChangeEvent } from 'react';
+import './FileUpload.css';
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
@@ -37,7 +37,7 @@ export const FileUpload = ({ onFileSelect }: FileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <Box>
+    <div className="file-upload">
       <input
         type="file"
         accept=".bmp"
@@ -45,34 +45,32 @@ export const FileUpload = ({ onFileSelect }: FileUploadProps) => {
         ref={fileInputRef}
         style={{ display: 'none' }}
       />
-      <Button
-        colorScheme="blackAlpha"
-        size="lg"
+      <button
+        className="upload-button"
         onClick={() => fileInputRef.current?.click()}
-        leftIcon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 16h6M12 16V8M12 8l3 3M12 8l-3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>}
       >
-        Choose BMP File
-      </Button>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 16h6M12 16V8M12 8l3 3M12 8l-3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        Select BMP File
+      </button>
 
       {fileInfo && (
-        <Box mt={4}>
-          <Text><strong>Name:</strong> {fileInfo.name} - <strong>Size:</strong> {fileInfo.size}</Text>
-        </Box>
+        <div className="file-info">
+          <p><strong>Name:</strong> {fileInfo.name} - <strong>Size:</strong> {fileInfo.size}</p>
+        </div>
       )}
 
       {preview && (
-        <Box mt={4} border="1px solid" borderColor="gray.200" p={2}>
-          <Text mb={2}>Preview:</Text>
-          <Image 
+        <div className="preview-container">
+          <p className="preview-title">Preview:</p>
+          <img 
             src={preview} 
             alt="Preview" 
-            maxH="200px"
-            objectFit="contain"
+            className="preview-image"
           />
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

@@ -36,15 +36,17 @@ export const resizeImage = (
     const low = imageData.data[i + 1];
     const value = (high << 8) | low;
     
-    const r = (value >> 11) & 0x1F;
-    const g = (value >> 5) & 0x3F;
-    const b = value & 0x1F;
+    // Extract RGB components from RGB565
+    const r5 = (value >> 11) & 0x1F;  // 5 bits for red
+    const g6 = (value >> 5) & 0x3F;   // 6 bits for green
+    const b5 = value & 0x1F;          // 5 bits for blue
     
+    // Convert to 8-bit color channels using proper scaling
     const j = (i / 2) * 4;
-    rgba[j] = (r << 3) | (r >> 2);     // 5 bits to 8 bits
-    rgba[j + 1] = (g << 2) | (g >> 4);  // 6 bits to 8 bits
-    rgba[j + 2] = (b << 3) | (b >> 2);  // 5 bits to 8 bits
-    rgba[j + 3] = 255;                  // Alpha channel
+    rgba[j] = Math.round((r5 * 255) / 31);     // Scale 5 bits to 8 bits
+    rgba[j + 1] = Math.round((g6 * 255) / 63); // Scale 6 bits to 8 bits
+    rgba[j + 2] = Math.round((b5 * 255) / 31); // Scale 5 bits to 8 bits
+    rgba[j + 3] = 255;                         // Alpha channel
   }
 
   // Create ImageData and put it on temp canvas
@@ -56,11 +58,28 @@ export const resizeImage = (
   
   // Get the resized image data
   const resizedData = ctx.getImageData(0, 0, finalWidth, finalHeight);
+  
+  // Convert back to RGB565
+  const rgb565Data = new Uint8Array(finalWidth * finalHeight * 2);
+  for (let i = 0, j = 0; i < resizedData.data.length; i += 4, j += 2) {
+    const r = resizedData.data[i];
+    const g = resizedData.data[i + 1];
+    const b = resizedData.data[i + 2];
+    
+    // Convert to RGB565
+    const r5 = Math.round((r * 31) / 255);  // Scale to 5 bits
+    const g6 = Math.round((g * 63) / 255);  // Scale to 6 bits
+    const b5 = Math.round((b * 31) / 255);  // Scale to 5 bits
+    
+    const rgb565 = (r5 << 11) | (g6 << 5) | b5;
+    rgb565Data[j] = (rgb565 >> 8) & 0xFF;     // High byte
+    rgb565Data[j + 1] = rgb565 & 0xFF;        // Low byte
+  }
 
   return {
     width: finalWidth,
     height: finalHeight,
-    data: new Uint8Array(resizedData.data)
+    data: rgb565Data
   };
 };
 

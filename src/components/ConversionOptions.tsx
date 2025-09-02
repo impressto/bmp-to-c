@@ -1,13 +1,5 @@
 import { useState } from 'react';
-import {
-  Box,
-  Input,
-  Text,
-  FormControl,
-  FormLabel,
-  VStack,
-  HStack,
-} from '@chakra-ui/react';
+import './ConversionOptions.css';
 
 export interface ConversionOptions {
   resizeWidth?: number;
@@ -30,12 +22,12 @@ export const ConversionOptionsForm = ({ onChange, originalWidth, originalHeight 
   };
 
   return (
-    <VStack spacing={4} align="stretch">
-      <Box>
-        <FormLabel>Resize Image</FormLabel>
-        <HStack spacing={4}>
-          <FormControl>
-            <Input
+    <div className="options-container">
+      <div className="resize-group">
+        <label>Resize Image</label>
+        <div className="dimensions-input">
+          <div className="input-group">
+            <input
               type="number"
               placeholder={originalWidth ? `Width (${originalWidth})` : 'Width'}
               value={options.resizeWidth || ''}
@@ -44,10 +36,10 @@ export const ConversionOptionsForm = ({ onChange, originalWidth, originalHeight 
                 handleChange('resizeWidth', value);
               }}
             />
-          </FormControl>
-          <Text>x</Text>
-          <FormControl>
-            <Input
+          </div>
+          <span className="dimension-separator">x</span>
+          <div className="input-group">
+            <input
               type="number"
               placeholder={originalHeight ? `Height (${originalHeight})` : 'Height'}
               value={options.resizeHeight || ''}
@@ -56,13 +48,9 @@ export const ConversionOptionsForm = ({ onChange, originalWidth, originalHeight 
                 handleChange('resizeHeight', value);
               }}
             />
-          </FormControl>
-        </HStack>
-      </Box>
-
-
-
-
-    </VStack>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

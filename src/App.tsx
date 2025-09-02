@@ -1,16 +1,34 @@
-import { Container, Box, Textarea, Button, Spinner, Center } from '@chakra-ui/react'
 import { useState } from 'react'
 import { FileUpload } from './components/FileUpload'
 import { ConversionOptionsForm, type ConversionOptions } from './components/ConversionOptions'
 import { convertToC, resizeImage } from './utils/imageConverter'
 import type { ImageData } from './utils/imageConverter'
+import './App.css'
 
 function App() {
   const [convertedCode, setConvertedCode] = useState<string>('')
   const [imageData, setImageData] = useState<ImageData | null>(null)
   const [filename, setFilename] = useState<string>('')
-  const [conversionOptions, setConversionOptions] = useState<ConversionOptions>({})
   const [isConverting, setIsConverting] = useState(false)
+
+  const [currentOptions, setCurrentOptions] = useState<ConversionOptions>({})
+
+  const handleConversionOptionsChange = (options: ConversionOptions) => {
+    setCurrentOptions(options)
+  }
+
+  const handleConvert = () => {
+    if (!imageData) return
+    // Apply current resize options when converting
+    if (currentOptions.resizeWidth || currentOptions.resizeHeight) {
+      const resizedImage = resizeImage(imageData, currentOptions.resizeWidth, currentOptions.resizeHeight)
+      const code = convertToC(resizedImage, filename)
+      setConvertedCode(code)
+    } else {
+      const code = convertToC(imageData, filename)
+      setConvertedCode(code)
+    }
+  }
 
   const handleFileSelect = async (file: File) => {
     setFilename(file.name)
@@ -83,116 +101,110 @@ function App() {
     URL.revokeObjectURL(url)
   }
 
-  return (
-    <Container maxW="container.xl" py={8}>
-      <Box display="flex" flexDirection="column" gap={8}>
+  const handleSaveImage = async () => {
+    if (!imageData) return
 
-        
+    // Use resized image if resize options are present
+    const finalImage = (currentOptions.resizeWidth || currentOptions.resizeHeight) 
+      ? resizeImage(imageData, currentOptions.resizeWidth, currentOptions.resizeHeight)
+      : imageData
+
+    // Create a canvas with the current image data
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')!
+    canvas.width = finalImage.width
+    canvas.height = finalImage.height
+
+    // Convert RGB565 back to RGBA
+    const rgba = new Uint8ClampedArray(finalImage.width * finalImage.height * 4)
+    for (let i = 0; i < finalImage.data.length; i += 2) {
+      const high = finalImage.data[i]
+      const low = finalImage.data[i + 1]
+      const value = (high << 8) | low
+      
+      // Extract RGB components from RGB565
+      const r5 = (value >> 11) & 0x1F;  // 5 bits for red
+      const g6 = (value >> 5) & 0x3F;   // 6 bits for green
+      const b5 = value & 0x1F;          // 5 bits for blue
+      
+      // Convert to 8-bit color channels
+      const r8 = Math.round((r5 * 255) / 31);  // Scale 5 bits to 8 bits
+      const g8 = Math.round((g6 * 255) / 63);  // Scale 6 bits to 8 bits
+      const b8 = Math.round((b5 * 255) / 31);  // Scale 5 bits to 8 bits
+      
+      const j = (i / 2) * 4
+      rgba[j] = r8;        // Red channel
+      rgba[j + 1] = g8;    // Green channel
+      rgba[j + 2] = b8;    // Blue channel
+      rgba[j + 3] = 255;   // Alpha channel
+    }
+
+    // Put the image data on the canvas
+    ctx.putImageData(new ImageData(rgba, finalImage.width, finalImage.height), 0, 0)
+
+    // Convert canvas to blob and download
+    const blob = await new Promise<Blob>(resolve => canvas.toBlob(blob => resolve(blob!), 'image/bmp'))
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    const bmpFilename = filename.replace(/\.[^/.]+$/, "") + '_converted.bmp'
+    a.download = bmpFilename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  return (
+    <div className="container">
+      <div className="content">
         <FileUpload onFileSelect={handleFileSelect} />
-        
-        <ConversionOptionsForm 
-          onChange={setConversionOptions}
-          originalWidth={imageData?.width}
-          originalHeight={imageData?.height}
-        />
+
+        {imageData && (
+          <ConversionOptionsForm
+            onChange={handleConversionOptionsChange}
+            originalWidth={imageData.width}
+            originalHeight={imageData.height}
+          />
+        )}
 
         {isConverting ? (
-          <Center>
-            <Spinner size="xl" />
-          </Center>
-        ) : (
-          <Button
-            colorScheme="blackAlpha"
-            onClick={() => {
-              if (!imageData) return;
-              setIsConverting(true);
-              const resizedImage = resizeImage(imageData, conversionOptions.resizeWidth, conversionOptions.resizeHeight);
-              const code = convertToC(resizedImage, filename);
-              setConvertedCode(code);
-              setIsConverting(false);
-            }}
-            disabled={!imageData}
-          >
-            Convert with Current Settings
-          </Button>
+          <div className="loading">
+            <div className="spinner"></div>
+          </div>
+        ) : imageData && (
+          <button className="convert-button" onClick={handleConvert}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 4v16M12 20l3-3M12 20l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            {(currentOptions.resizeWidth || currentOptions.resizeHeight) ? 'Reconvert to C' : 'Convert to C'}
+          </button>
         )}
 
         {convertedCode && (
-          <Box display="flex" flexDirection="column" gap={4}>
-            <Textarea
+          <div className="output-section">
+            <textarea
               value={convertedCode}
               readOnly
-              height="300px"
-              fontFamily="mono"
+              rows={10}
+              className="output-textarea"
             />
-            <Button colorScheme="blackAlpha" onClick={handleCopyToClipboard}>
-              Copy to Clipboard
-            </Button>
-            <Button colorScheme="blackAlpha" onClick={handleSaveToFile}>
-              Save as Header File
-            </Button>
-            <Button colorScheme="blackAlpha" onClick={async () => {
-              if (!imageData) return;
-              // For resized images, we need to handle the data differently
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d')!;
-
-              // First convert the RGB565 data back to RGBA for the initial canvas
-              const tempCanvas = document.createElement('canvas');
-              const tempCtx = tempCanvas.getContext('2d')!;
-              tempCanvas.width = imageData.width;
-              tempCanvas.height = imageData.height;
-              
-              const rgba = new Uint8ClampedArray(imageData.width * imageData.height * 4);
-              for (let i = 0; i < imageData.data.length; i += 2) {
-                const high = imageData.data[i];
-                const low = imageData.data[i + 1];
-                const value = (high << 8) | low;
-                
-                const r = (value >> 11) & 0x1F;
-                const g = (value >> 5) & 0x3F;
-                const b = value & 0x1F;
-                
-                const j = (i / 2) * 4;
-                rgba[j] = (r << 3) | (r >> 2);     // 5 bits to 8 bits
-                rgba[j + 1] = (g << 2) | (g >> 4);  // 6 bits to 8 bits
-                rgba[j + 2] = (b << 3) | (b >> 2);  // 5 bits to 8 bits
-                rgba[j + 3] = 255;                  // Alpha channel
-              }
-              
-              // Put the original image data on the temp canvas
-              tempCtx.putImageData(new ImageData(rgba, imageData.width, imageData.height), 0, 0);
-              
-              // Set up the final canvas with desired dimensions
-              const finalWidth = conversionOptions.resizeWidth || imageData.width;
-              const finalHeight = conversionOptions.resizeHeight || imageData.height;
-              canvas.width = finalWidth;
-              canvas.height = finalHeight;
-              
-              // Draw the resized image using proper image scaling
-              ctx.drawImage(tempCanvas, 0, 0, finalWidth, finalHeight);
-              
-              // Convert to blob and save
-              canvas.toBlob((blob) => {
-                if (!blob) return;
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                const imageFilename = filename.replace(/\.[^/.]+$/, "") + '_resized.bmp';
-                a.download = imageFilename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-              }, 'image/bmp');
-            }}>
-              Save Resized Image
-            </Button>
-          </Box>
+            <div className="button-group">
+              <button className="action-button" onClick={handleCopyToClipboard}>
+                Copy to Clipboard
+              </button>
+              <button className="action-button" onClick={handleSaveToFile}>
+                Save to File
+              </button>
+              <button className="action-button" onClick={handleSaveImage}>
+                Save Image
+              </button>
+            </div>
+          </div>
         )}
-      </Box>
-    </Container>
-  )
+      </div>
+    </div>
+  );
 }
 
 export default App

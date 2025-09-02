@@ -1,0 +1,47 @@
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.resize-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resize-group label {
+  font-weight: 600;
+  color: #333;
+}
+
+.dimensions-input {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.input-group {
+  flex: 1;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #333;
+}
+
+.dimension-separator {
+  font-weight: bold;
+  color: #333;
+}
