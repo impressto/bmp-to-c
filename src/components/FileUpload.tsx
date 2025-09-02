@@ -46,7 +46,7 @@ export const FileUpload = ({ onFileSelect }: FileUploadProps) => {
         style={{ display: 'none' }}
       />
       <Button
-        colorScheme="blue"
+        colorScheme="blackAlpha"
         size="lg"
         onClick={() => fileInputRef.current?.click()}
         leftIcon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

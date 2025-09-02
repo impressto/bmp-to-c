@@ -102,7 +102,7 @@ function App() {
           </Center>
         ) : (
           <Button
-            colorScheme="blue"
+            colorScheme="blackAlpha"
             onClick={() => {
               if (!imageData) return;
               setIsConverting(true);
@@ -125,13 +125,13 @@ function App() {
               height="300px"
               fontFamily="mono"
             />
-            <Button onClick={handleCopyToClipboard}>
+            <Button colorScheme="blackAlpha" onClick={handleCopyToClipboard}>
               Copy to Clipboard
             </Button>
-            <Button onClick={handleSaveToFile}>
+            <Button colorScheme="blackAlpha" onClick={handleSaveToFile}>
               Save as Header File
             </Button>
-            <Button onClick={async () => {
+            <Button colorScheme="blackAlpha" onClick={async () => {
               if (!imageData) return;
               // For resized images, we need to handle the data differently
               const canvas = document.createElement('canvas');
