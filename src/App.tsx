@@ -1,4 +1,4 @@
-import { Container, Heading, Box, Textarea, Button, Spinner, Center } from '@chakra-ui/react'
+import { Container, Box, Textarea, Button, Spinner, Center } from '@chakra-ui/react'
 import { useState } from 'react'
 import { FileUpload } from './components/FileUpload'
 import { ConversionOptionsForm, type ConversionOptions } from './components/ConversionOptions'
