@@ -99,14 +99,20 @@ export const convertToC = (
     const value = (bytes[i] << 8) | bytes[i + 1];
     hexData.push('0x' + value.toString(16).padStart(4, '0'));
   }
-  const formattedHexData = hexData.join(', ');
+
+  // Format hexData into lines of 12 values each
+  const hexLines = [];
+  for (let i = 0; i < hexData.length; i += 12) {
+    hexLines.push(hexData.slice(i, i + 12).join(', '));
+  }
+  const formattedHexData = hexLines.join(',\n  ');
 
   // Calculate array size
   const arraySize = hexData.length;
   
   // Add image data array as 16-bit values with size comment
   declarations.push(
-    `// array size is ${arraySize}\nint16_t ${variableName}[]${progmemKeyword} = {
+    `// array size is ${arraySize}\nconst uint16_t ${variableName}[]${progmemKeyword} = {
   ${formattedHexData}
 };`
   );
