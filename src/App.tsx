@@ -1,4 +1,14 @@
 import { useState, useRef } from 'react'
+
+// Header and source code link
+const AppHeader = () => (
+  <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+    <h2>Generate C code from a BMP file for use with TFT displays.</h2>
+    <div>
+      Source code for this tool: <a href="https://github.com/impressto/bmp-to-c" target="_blank" rel="noopener noreferrer">https://github.com/impressto/bmp-to-c</a>
+    </div>
+  </div>
+);
 import { FileUpload } from './components/FileUpload'
 import type { FileUploadHandle } from './components/FileUpload'
 import { ConversionOptionsForm, type ConversionOptions } from './components/ConversionOptions'
@@ -159,15 +169,16 @@ function App() {
   // Ref for FileUpload to allow programmatic file selection
   const fileUploadRef = useRef<FileUploadHandle>(null);
   const handleLoadExampleImage = async () => {
-    const response = await fetch('src/images/rainbow_spiral.bmp');
+  const response = await fetch('/images/rainbow_spiral.bmp');
     const blob = await response.blob();
     const file = new File([blob], 'rainbow_spiral.bmp', { type: 'image/bmp' });
     fileUploadRef.current?.triggerFileSelect(file);
   };
 
   return (
-    <div className="container">
-      <div className="content">
+    <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <AppHeader />
+      <div className="content" style={{ width: '100%' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1rem' }}>
           <FileUpload ref={fileUploadRef} onFileSelect={handleFileSelect} onExampleClick={handleLoadExampleImage} />
         </div>

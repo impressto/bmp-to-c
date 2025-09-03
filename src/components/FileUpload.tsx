@@ -13,7 +13,8 @@ export interface FileUploadHandle {
 
 
 export const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(({ onFileSelect, onExampleClick }, ref) => {
-  const [preview, setPreview] = useState<string | null>(null);
+  // Preview is always the PNG image for display
+  const previewPngUrl = '/images/rainbow_spiral.png';
   const [fileInfo, setFileInfo] = useState<{ name: string; size: string } | null>(null);
 
   const triggerFileSelect = (file: File) => {
@@ -21,13 +22,6 @@ export const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(({ onFil
       name: file.name,
       size: `${(file.size / 1024).toFixed(2)} KB`
     });
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => setPreview(e.target?.result as string);
-      reader.readAsDataURL(file);
-    } else {
-      setPreview(null);
-    }
     onFileSelect(file);
   };
 
@@ -72,11 +66,11 @@ export const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(({ onFil
         </div>
       )}
 
-      {preview && (
+      {fileInfo && (
         <div className="preview-container">
           <p className="preview-title">Preview:</p>
           <img 
-            src={preview} 
+            src={previewPngUrl} 
             alt="Preview" 
             className="preview-image"
           />
