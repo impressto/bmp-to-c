@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { FileUpload } from './components/FileUpload'
+import type { FileUploadHandle } from './components/FileUpload'
 import { ConversionOptionsForm, type ConversionOptions } from './components/ConversionOptions'
 import { convertToC, resizeImage } from './utils/imageConverter'
 import type { ImageData } from './utils/imageConverter'
@@ -155,42 +156,22 @@ function App() {
     URL.revokeObjectURL(url)
   }
 
-  // Function to load the example BMP image
-  const [exampleImageUrl, setExampleImageUrl] = useState<string | null>(null);
-  const [exampleFileInfo, setExampleFileInfo] = useState<{ name: string; size: string } | null>(null);
+  // Ref for FileUpload to allow programmatic file selection
+  const fileUploadRef = useRef<FileUploadHandle>(null);
   const handleLoadExampleImage = async () => {
     const response = await fetch('src/images/rainbow_spiral.bmp');
     const blob = await response.blob();
     const file = new File([blob], 'rainbow_spiral.bmp', { type: 'image/bmp' });
-    const url = URL.createObjectURL(blob);
-    setExampleImageUrl(url);
-    setExampleFileInfo({
-      name: file.name,
-      size: `${(file.size / 1024).toFixed(2)} KB`
-    });
-    handleFileSelect(file);
+    fileUploadRef.current?.triggerFileSelect(file);
   };
 
   return (
     <div className="container">
       <div className="content">
-        <FileUpload onFileSelect={handleFileSelect} />
+        <FileUpload ref={fileUploadRef} onFileSelect={handleFileSelect} />
         <button className="example-image-button" onClick={handleLoadExampleImage} style={{marginBottom: '1rem'}}>
           Use Example BMP Image
         </button>
-        {exampleImageUrl && (
-          <div className="example-image-preview" style={{marginBottom: '1rem'}}>
-            {exampleFileInfo && (
-              <div className="file-info">
-                <p><strong>Name:</strong> {exampleFileInfo.name} - <strong>Size:</strong> {exampleFileInfo.size}</p>
-              </div>
-            )}
-            <div className="preview-container">
-              <p className="preview-title">Preview:</p>
-              <img src={exampleImageUrl} alt="Example BMP" className="preview-image" />
-            </div>
-          </div>
-        )}
 
         {imageData && (
           <ConversionOptionsForm

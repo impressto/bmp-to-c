@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import type { ChangeEvent } from 'react';
 import './FileUpload.css';
 
@@ -6,34 +6,39 @@ interface FileUploadProps {
   onFileSelect: (file: File) => void;
 }
 
-export const FileUpload = ({ onFileSelect }: FileUploadProps) => {
+export interface FileUploadHandle {
+  triggerFileSelect: (file: File) => void;
+}
+
+
+export const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(({ onFileSelect }, ref) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [fileInfo, setFileInfo] = useState<{ name: string; size: string } | null>(null);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Update file info
+  const triggerFileSelect = (file: File) => {
     setFileInfo({
       name: file.name,
       size: `${(file.size / 1024).toFixed(2)} KB`
     });
-
-    // Create preview if it's an image
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreview(e.target?.result as string);
-      };
+      reader.onload = (e) => setPreview(e.target?.result as string);
       reader.readAsDataURL(file);
     } else {
       setPreview(null);
     }
-
     onFileSelect(file);
   };
 
+  useImperativeHandle(ref, () => ({ triggerFileSelect }));
+
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    triggerFileSelect(file);
+  };
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -73,4 +78,4 @@ export const FileUpload = ({ onFileSelect }: FileUploadProps) => {
       )}
     </div>
   );
-};
+});
