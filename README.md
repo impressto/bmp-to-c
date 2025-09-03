@@ -1,70 +1,34 @@
-# React + TypeScript + Vite
+# animated eyes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
 # bmp-to-c
+
+This project allows users to upload bitmap (BMP) images and convert them into C code arrays. The generated C code can then be saved as a header file (`.h`) for use in ESP32 and Arduino projects that utilize TFT displays.
+
+## Purpose
+
+Working with images on embedded systems like the ESP32 and Arduino can be challenging, especially when using TFT displays. This tool simplifies the process by:
+
+- Accepting bitmap images as input.
+- Converting the image into C array data.
+- Allowing the result to be exported as a header file.
+
+This makes it easy for developers to include custom graphics, icons, or splash screens directly into their microcontroller code without manually converting image data.
+
+## Tech Stack
+
+- **React + TypeScript + Vite**: Frontend framework with fast development and HMR (Hot Module Replacement).
+- **ESLint configuration**: For code consistency and quality.
+
+## How It Works
+
+1. Upload a bitmap image (`.bmp`).
+2. The application processes the image and generates equivalent C array data.
+3. Save the output as a `.h` header file.
+4. Include the header in your ESP32 or Arduino project to display the image on a TFT screen.
+
+## Example Use Case
+
+- Adding a company logo to an ESP32-based IoT device.
+- Displaying icons on a small TFT screen for an Arduino project.
+- Creating lightweight custom graphics for embedded dashboards.
+
