@@ -12,7 +12,6 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
   color: white;
@@ -21,6 +20,8 @@
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
+  padding: 0.75rem;
+
 }
 
 .upload-button:hover {

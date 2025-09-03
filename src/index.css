@@ -36,7 +36,6 @@ body {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
 }
 
 h1 {
@@ -49,6 +48,9 @@ button {
   border: none;
   cursor: pointer;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 button:hover {
   border-color: #646cff;
