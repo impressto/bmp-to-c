@@ -57,7 +57,7 @@
   transition: background-color 0.2s;
   align-self: flex-start;
   padding: 0.5rem 1rem;
-  max-width: 200px;
+  width: 100%;
   padding: 0.75rem;
 
 }
@@ -134,7 +134,9 @@
 .output-textarea {
   width: 100%;
   min-height: 200px;
-  padding: 1rem;
+  padding: 1rem 0;
+  margin-left: auto;
+  margin-right: auto;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-family: monospace;

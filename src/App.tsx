@@ -168,10 +168,9 @@ function App() {
   return (
     <div className="container">
       <div className="content">
-        <FileUpload ref={fileUploadRef} onFileSelect={handleFileSelect} />
-        <button className="example-image-button" onClick={handleLoadExampleImage} style={{marginBottom: '1rem'}}>
-          Use Example BMP Image
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1rem' }}>
+          <FileUpload ref={fileUploadRef} onFileSelect={handleFileSelect} onExampleClick={handleLoadExampleImage} />
+        </div>
 
         {imageData && (
           <ConversionOptionsForm

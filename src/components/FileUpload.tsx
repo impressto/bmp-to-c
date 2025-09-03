@@ -4,6 +4,7 @@ import './FileUpload.css';
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
+  onExampleClick?: () => void;
 }
 
 export interface FileUploadHandle {
@@ -11,7 +12,7 @@ export interface FileUploadHandle {
 }
 
 
-export const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(({ onFileSelect }, ref) => {
+export const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(({ onFileSelect, onExampleClick }, ref) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [fileInfo, setFileInfo] = useState<{ name: string; size: string } | null>(null);
 
@@ -59,6 +60,11 @@ export const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(({ onFil
         </svg>
         Select BMP File
       </button>
+      {onExampleClick && (
+        <button className="example-image-button" onClick={onExampleClick}>
+          Use Example File
+        </button>
+      )}
 
       {fileInfo && (
         <div className="file-info">
