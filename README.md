@@ -1,6 +1,5 @@
-# animated eyes
 
-# bmp-to-c
+# bitmap converter
 
 This project allows users to upload bitmap (BMP) images and convert them into C code arrays. The generated C code can then be saved as a header file (`.h`) for use in ESP32 and Arduino projects that utilize TFT displays.
 
